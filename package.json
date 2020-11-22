@@ -1,0 +1,9 @@
+{
+  "name": "lambda-edge-response",
+  "version": "0.0.1",
+  "description": "A lightweight response payload builder for lambda@edge",
+  "main": "index.js",
+  "repository": "git@github.com:adriaan-pelzer/lambda-edge-response.git",
+  "author": "Adriaan Pelzer <adriaan.pelzer@gmail.com>",
+  "license": "MIT"
+}
