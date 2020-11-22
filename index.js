@@ -75,7 +75,7 @@ const buildResponse = ({ statusCode = 200, headers = {}, body }) => ({
   statusDescription: statusDescriptions[statusCode] || 'Unresolved',
   headers: Object.keys(headers).reduce((hdrs, key) => ({
     ...hdrs,
-    ...(headers[key] ? { [key.toLowerCase()]: [{ key, value: headers[key] }] } : {})
+    ...(headers[key] ? { [key.toLowerCase()]: [{ key, value: headers[key].toString() }] } : {})
   }), {}),
   body: generateBody(headers['Content-Type'], body)
 });
