@@ -70,12 +70,16 @@ const generateBody = (contentType, body) => {
   return body.toString('utf8');
 };
 
+const capitalise = headerKey => headerKey.split('-').map(
+  part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+).join('-');
+
 const buildResponse = ({ statusCode = 200, headers = {}, body }) => ({
   status: statusCode.toString(),
   statusDescription: statusDescriptions[statusCode] || 'Unresolved',
   headers: Object.keys(headers).reduce((hdrs, key) => ({
     ...hdrs,
-    ...(headers[key] ? { [key.toLowerCase()]: [{ key, value: headers[key].toString() }] } : {})
+    ...(headers[key] ? { [key.toLowerCase()]: [{ key: capitalise(key), value: headers[key].toString() }] } : {})
   }), {}),
   body: generateBody(headers['Content-Type'], body)
 });
