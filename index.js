@@ -64,24 +64,25 @@ const statusDescriptions = {
   511: 'Network Authentication Required'
 };
 
-const generateBody = (contentType, body) => {
+const generateBody = (contentType, body, bodyEncoding) => {
   if (typeof body === 'undefined' || typeof body === 'string') { return body; }
   if (contentType === 'application/json') { return JSON.stringify(body); }
-  return body.toString('utf8');
+  return body.toString(bodyEncoding);
 };
 
 const capitalise = headerKey => headerKey.split('-').map(
   part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
 ).join('-');
 
-const buildResponse = ({ statusCode = 200, headers = {}, body }) => ({
+const buildResponse = ({ statusCode = 200, headers = {}, body, bodyEncoding = 'utf8' }) => ({
   status: statusCode.toString(),
   statusDescription: statusDescriptions[statusCode] || 'Unresolved',
   headers: Object.keys(headers).reduce((hdrs, key) => ({
     ...hdrs,
     ...(headers[key] ? { [key.toLowerCase()]: [{ key: capitalise(key), value: headers[key].toString() }] } : {})
   }), {}),
-  body: generateBody(headers['Content-Type'], body)
+  bodyEncoding,
+  body: generateBody(headers['Content-Type'], body, bodyEncoding)
 });
 
 module.exports = buildResponse;
