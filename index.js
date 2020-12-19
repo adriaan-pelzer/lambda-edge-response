@@ -64,17 +64,38 @@ const statusDescriptions = {
   511: 'Network Authentication Required'
 };
 
-const generateBody = (contentType, body, bodyEncoding) => {
+const generateBody = (contentType, body, bodyEncoding = 'text') => {
+  if (bodyEncoding !== 'text' && bodyEncoding !== 'base64') {
+    throw buildResponse({
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: { error: `illegal body encoding: ${bodyEncoding}` }
+    });
+  }
   if (typeof body === 'undefined' || typeof body === 'string') { return body; }
-  if (contentType === 'application/json') { return JSON.stringify(body); }
-  return body.toString(bodyEncoding);
+  if (contentType === 'application/json') {
+    if (typeof body === 'object') { return JSON.stringify(body); }
+    if (typeof body !== 'string') {
+      throw buildResponse({
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json' },
+        body: { error: `illegal body type with application/json content-type: ${typeof body}`, body }
+      });
+    }
+    return body;
+  }
+  throw buildResponse({
+    statusCode: 500,
+    headers: { 'Content-Type': 'application/json' },
+    body: { error: `illegal body type: ${typeof body}`, body }
+  });
 };
 
 const capitalise = headerKey => headerKey.split('-').map(
   part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
 ).join('-');
 
-const buildResponse = ({ statusCode = 200, headers = {}, body, bodyEncoding = 'utf8' }) => ({
+const buildResponse = ({ statusCode = 200, headers = {}, body, bodyEncoding }) => ({
   status: statusCode.toString(),
   statusDescription: statusDescriptions[statusCode] || 'Unresolved',
   headers: Object.keys(headers).reduce((hdrs, key) => ({
